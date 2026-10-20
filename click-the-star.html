@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Click the Star!</title>
+<style>
+*{box-sizing:border-box}body{margin:0;min-height:100vh;font-family:Arial,sans-serif;background:linear-gradient(135deg,#101b45,#48217c);color:#fff;display:flex;align-items:center;justify-content:center;padding:18px}
+.game{width:min(700px,100%);background:#ffffff12;border:1px solid #ffffff35;border-radius:24px;padding:26px;text-align:center;box-shadow:0 20px 70px #0005}
+h1{margin:0;font-size:clamp(30px,6vw,48px)}p{color:#e5ddff}.stats{display:flex;justify-content:center;gap:12px;flex-wrap:wrap;margin:18px 0}.stat{background:#080d2c88;padding:12px 20px;border-radius:12px;min-width:110px}.stat b{display:block;font-size:25px;color:#ffe36e}
+#arena{height:330px;position:relative;background:#080d2c88;border:2px solid #ffffff25;border-radius:16px;overflow:hidden}
+#target{position:absolute;display:none;border:0;background:none;font-size:42px;cursor:pointer;filter:drop-shadow(0 0 12px #ffe36e);transform:translate(-50%,-50%);user-select:none}
+button.action{border:0;border-radius:12px;background:#ffe36e;color:#24154a;padding:13px 24px;font-size:17px;font-weight:bold;cursor:pointer;margin:8px}button.action:hover{filter:brightness(1.08)}#message{font-weight:bold;min-height:24px}
+</style>
+</head>
+<body>
+<main class="game">
+<h1>⭐ Click the Star!</h1>
+<p>Click as many stars as you can in 20 seconds. It's that simple!</p>
+<div class="stats"><div class="stat">Score<b id="score">0</b></div><div class="stat">Time left<b id="time">20</b></div><div class="stat">Best<b id="best">0</b></div></div>
+<div id="arena"><button id="target" aria-label="Click star">⭐</button></div>
+<div><button class="action" id="start">▶ Start Game</button><button class="action" id="reset">↻ Reset</button></div>
+<div id="message">Press Start Game to begin.</div>
+<p>Tip: The star moves every time you click it!</p>
+</main>
+<script>
+const arena=document.getElementById('arena'),target=document.getElementById('target'),scoreEl=document.getElementById('score'),timeEl=document.getElementById('time'),bestEl=document.getElementById('best'),message=document.getElementById('message');
+let score=0,time=20,timer=null,playing=false,best=Number(localStorage.getItem('clickStarBest')||0);bestEl.textContent=best;
+function moveTarget(){const pad=30;target.style.left=(pad+Math.random()*(arena.clientWidth-pad*2))+'px';target.style.top=(pad+Math.random()*(arena.clientHeight-pad*2))+'px';}
+function endGame(){playing=false;clearInterval(timer);target.style.display='none';if(score>best){best=score;localStorage.setItem('clickStarBest',best);bestEl.textContent=best;}message.textContent='Time is up! You scored '+score+'. Press Start Game to play again.';}
+document.getElementById('start').addEventListener('click',()=>{clearInterval(timer);score=0;time=20;playing=true;scoreEl.textContent=score;timeEl.textContent=time;message.textContent='Go! Click the star!';target.style.display='block';moveTarget();timer=setInterval(()=>{time--;timeEl.textContent=time;if(time<=0)endGame();},1000);});
+target.addEventListener('click',()=>{if(!playing)return;score++;scoreEl.textContent=score;target.textContent=['⭐','🌟','✨'][Math.floor(Math.random()*3)];moveTarget();});
+document.getElementById('reset').addEventListener('click',()=>{clearInterval(timer);playing=false;score=0;time=20;scoreEl.textContent=0;timeEl.textContent=20;target.style.display='none';target.textContent='⭐';message.textContent='Press Start Game to begin.';});
+</script>
+</body>
+</html>
